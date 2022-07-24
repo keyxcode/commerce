@@ -8,7 +8,11 @@ from .models import *
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+    listing = Listing.objects.filter(is_active=True)
+
+    return render(request, "auctions/index.html", {
+        "listings": listing
+    })
 
 
 def login_view(request):
@@ -22,9 +26,7 @@ def login_view(request):
         # Check if authentication successful
         if user is not None:
             login(request, user)
-            return HttpResponseRedirect(reverse("index"), {
-                "listings": Listing.objects.filter(creator=user.id)
-            })
+            return HttpResponseRedirect(reverse("index"))
         else:
             return render(request, "auctions/login.html", {
                 "message": "Invalid username and/or password."
@@ -63,3 +65,33 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/register.html")
+
+
+def create_listing(request):
+    if request.method == "POST":
+        title = request.POST['title']
+        description = request.POST['description']
+        image_url = request.POST['image_url']
+        starting_bid = request.POST['starting_bid']
+        category = request.POST['category']
+        creator = request.user
+        
+        new_listing = Listing.objects.create(
+            title = title,
+            description = description,
+            image_url = image_url,
+            starting_bid = starting_bid,
+            category = Category.objects.get(category=category),
+            creator = creator)
+        new_listing.save()
+        
+        return HttpResponseRedirect(reverse("index"))
+    
+    categorys = Category.objects.all()
+    return render(request, "auctions/create_listing.html", {
+        "categorys": categorys
+    })
+
+
+def listing(request, listing_id):
+    pass
