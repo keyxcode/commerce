@@ -9,39 +9,56 @@
         <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
     </head>
     <body>
-        <h1>Auctions</h1>
-        <div>
-            {% if user.is_authenticated %}
-                Signed in as <strong>{{ user.username }}</strong>.
-            {% else %}
-                Not signed in.
-            {% endif %}
+        <div class="row mb-0">
+            <div class="col-md-2">
+                <h1>
+                    <a href="{% url 'index' %}">
+                        Auctions
+                    </a>
+                </h1>
+            </div>
+            <div class="col-md-10">
+                <div class="float-end">
+                    <div class="text-end">
+                        {% if user.is_authenticated %}
+                            Signed in as <strong>{{ user.username }}</strong>
+                        {% else %}
+                            Not signed in.
+                        {% endif %}
+                    </div>
+                    <ul class="nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
+                        </li>
+                        {% if user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'create_listing' %}">Create Listing</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link pe-0" href="{% url 'logout' %}">Log Out</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'login' %}">Log In</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link pe-0" href="{% url 'register' %}">Register</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
         </div>
-        <ul class="nav">
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'categories' %}">Categories</a>
-            </li>
-            {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'create_listing' %}">Create Listing</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
-                </li>
-            {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login' %}">Log In</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'register' %}">Register</a>
-                </li>
-            {% endif %}
-        </ul>
         <hr>
-        {% block body %}
-        {% endblock %}
+        <div class="row">
+            <div class="col-md-2">
+                {% block left-body %}
+                {% endblock %}
+            </div>
+            <div class="col-md-8 border px-5">
+                {% block body %}
+                {% endblock %}
+            </div>
+        </div>
     </body>
 </html>

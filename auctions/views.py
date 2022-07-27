@@ -98,15 +98,6 @@ def create_listing(request):
     })
 
 
-def categories(request):
-    # Get all categories
-    categorys = Category.objects.all()
-
-    return render(request, "auctions/categories.html", {
-        "categorys": categorys
-    })
-
-
 def listing(request, listing_id):
     # Get the listing requested with id
     listing = Listing.objects.get(pk=listing_id)
@@ -119,9 +110,11 @@ def listing(request, listing_id):
 def category_listings(request, category_id):
     # Get the category requested with id
     category = Category.objects.get(pk=category_id)
+    categorys = Category.objects.all()
     listings = Listing.objects.filter(category=category_id)
 
     return render(request, "auctions/category_listings.html", {
+        "categorys": categorys,
         "category": category,
         "listings": listings
     })
