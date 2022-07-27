@@ -1,0 +1,39 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Category: {{ category }}</h2>
+    <div class="container">
+        {% for listing in listings %}
+        <div class="row gx-5">
+            <div class="col-md-3 border">
+                <a href="{% url 'listing' listing.id %}">
+                {% if listing.image_url %}
+                    <img src="{{ listing.image_url }}" class="h-100 w-100" alt="product-image">
+                {% else %}
+                    <img src="https://st2.depositphotos.com/2586633/46477/v/380/depositphotos_464771766-stock-illustration-no-photo-or-blank-image.jpg" class="h-100 w-100" alt="product-image">
+                {% endif %}
+                </a>
+            </div>
+            <div class="col-md-9">
+                <a href="{% url 'listing' listing.id %}">
+                    <div class="row h5">
+                        {{ listing.title }}
+                    </div>
+                </a>
+                <div class="row font-italic h3">
+                    {% if listing.current_bid %}
+                        ${{ listing.current_bid }}
+                    {% else %}
+                        ${{ listing.starting_bid }}
+                    {% endif %}
+                </div>
+                <div class="row font-italic text-muted">
+                    "{{ listing.description }}"
+                </div>
+            </div>
+        </div>
+        <hr>
+        {% endfor %}
+    </div>
+
+{% endblock %}

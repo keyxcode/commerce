@@ -10,3 +10,15 @@ a {
 a:hover {
     color: black;
 }
+
+.style-a {
+    color: blue;
+}
+
+.style-a:hover {
+    color: blue;
+}
+
+.font-italic {
+    font-style: italic !important;
+}

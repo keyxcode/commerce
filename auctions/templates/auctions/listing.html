@@ -1,0 +1,73 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>{{ listing.title }}</h2>
+    <hr>
+    <div class="container">
+        <div class="row gx-5">
+            <div class="col-md-5 border">
+                {% if listing.image_url %}
+                    <img src="{{ listing.image_url }}" class="h-100 w-100" alt="product-image">
+                {% else %}
+                    <img src="https://st2.depositphotos.com/2586633/46477/v/380/depositphotos_464771766-stock-illustration-no-photo-or-blank-image.jpg" class="h-100 w-100" alt="product-image">
+                {% endif %}
+            </div>
+            <div class="col-md-7">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <span>Current bid: </span>
+                        <span class="h3">
+                            US
+                            {% if listing.current_bid %}
+                                ${{ listing.current_bid }}
+                            {% else %}
+                                ${{ listing.starting_bid }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="col-md-6">
+                        [??? bids]
+                    </div>
+                </div>
+                <hr>
+                <form action="#" class="row mb-3">
+                    <div class="col-md-6 form-group">
+                        <input class="form-control" placeholder="Bid Amount" type="number">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <input class="btn btn-primary form-control" type="button" value="Place Bid">
+                    </div>
+                </form>
+                <div class="row mb-3">
+                    <div class="col-md-6 font-italic text-muted">
+                        Enter US
+                        {% if listing.current_bid %}
+                            ${{ listing.current_bid }} 
+                        {% else %}
+                            ${{ listing.starting_bid }} 
+                        {% endif %}
+                        or more
+                    </div>
+                    <form action="#" class="col-md-6">
+                        <input class="btn btn-outline-primary form-control" type="button" value="Add to Watchlist">
+                    </form>
+                </div>
+                <hr>
+                <div class="row mb-3">
+                    <div class="col">
+                        <span class="h6">
+                            Product Description: 
+                        </span>
+                        <span>
+                            {{ listing.description }}
+                        </span>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+    </div>
+
+
+{% endblock %}

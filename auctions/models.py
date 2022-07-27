@@ -17,7 +17,7 @@ class Category(models.Model):
 class Listing(models.Model):
     title = models.CharField(max_length=64)
     description = models.CharField(max_length=256)
-    image_url = models.CharField(max_length=128)
+    image_url = models.CharField(max_length=128, blank=True, null=True)
     starting_bid = models.DecimalField(max_digits=7, decimal_places=2)
     current_bid = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, related_name="similar_listings")
@@ -25,7 +25,7 @@ class Listing(models.Model):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.title}"
+        return f"{self.id}: {self.title}"
 
 
 class Bid(models.Model):

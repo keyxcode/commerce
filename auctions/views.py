@@ -8,10 +8,13 @@ from .models import *
 
 
 def index(request):
+    # Get all categories & listings 
     listing = Listing.objects.filter(is_active=True)
+    categorys = Category.objects.all()
 
     return render(request, "auctions/index.html", {
-        "listings": listing
+        "listings": listing,
+        "categorys": categorys
     })
 
 
@@ -68,6 +71,7 @@ def register(request):
 
 
 def create_listing(request):
+    # Gather info if the route was reached after submitting create form
     if request.method == "POST":
         title = request.POST['title']
         description = request.POST['description']
@@ -76,6 +80,7 @@ def create_listing(request):
         category = request.POST['category']
         creator = request.user
         
+        # Create the new listing object and save it
         new_listing = Listing.objects.create(
             title = title,
             description = description,
@@ -93,5 +98,30 @@ def create_listing(request):
     })
 
 
+def categories(request):
+    # Get all categories
+    categorys = Category.objects.all()
+
+    return render(request, "auctions/categories.html", {
+        "categorys": categorys
+    })
+
+
 def listing(request, listing_id):
-    pass
+    # Get the listing requested with id
+    listing = Listing.objects.get(pk=listing_id)
+
+    return render(request, "auctions/listing.html", {
+        "listing": listing
+    })
+
+
+def category_listings(request, category_id):
+    # Get the category requested with id
+    category = Category.objects.get(pk=category_id)
+    listings = Listing.objects.filter(category=category_id)
+
+    return render(request, "auctions/category_listings.html", {
+        "category": category,
+        "listings": listings
+    })
