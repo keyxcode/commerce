@@ -90,8 +90,12 @@ def create_listing(request):
             creator = creator)
         new_listing.save()
         
-        return HttpResponseRedirect(reverse("index"))
+        # return HttpResponseRedirect(reverse("index"))
+        return render(request, "auctions/listing.html", {
+            "listing": new_listing
+        })
     
+    # Return the create listing form if the route was reached by GET
     categorys = Category.objects.all()
     return render(request, "auctions/create_listing.html", {
         "categorys": categorys

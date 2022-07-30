@@ -1,3 +1,4 @@
+from tkinter import CASCADE
 from unicodedata import category
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -34,4 +35,6 @@ class Bid(models.Model):
 
 
 class Comment(models.Model):
-    pass
+    content = models.CharField(max_length=256)
+    commenter = models.ForeignKey(User, on_delete=models.CASCADE)
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
