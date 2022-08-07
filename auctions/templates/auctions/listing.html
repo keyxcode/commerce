@@ -81,12 +81,17 @@
                 {% else %}
                     <!-- Bid over status -->
                     <div class="row mb-3">
-                        <div class="col">This bid is over!</div>
+                        <div class="col text-danger">This bid is over!</div>
                     </div>
                     <div class="row mb-3">
                         <div class="col">
-                            <span>The winner is </span>
+                            {% if listing.winner %}
+                            <span class="text-success">Winner: </span>
                             <span class="fw-bold">{{ listing.winner.username }}</span>
+                            <span>({{ listing.winner.email }})</span>
+                            {% else %}
+                            <span> There are no winners for this listing.</span>
+                            {% endif %}
                         </div>    
                     </div>
                 {% endif %}
@@ -95,13 +100,14 @@
                 <div class="row mb-3">
                     <div class="col-md-7">
                         <span class="h6">
-                            Sold by: 
+                            Seller: 
                         </span>
                         <span>
                             {% if user == listing.creator %}
                                 Yourself
                             {% else %}                               
                                 {{ listing.creator.username }}
+                                ({{ listing.creator.email }})
                             {% endif %}
                         </span>
                     </div>

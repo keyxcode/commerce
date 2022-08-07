@@ -12,13 +12,6 @@ def index(request):
     listings = Listing.objects.filter(is_active=True).order_by('-id')
     categorys = Category.objects.all().order_by('category')
 
-    # # Update all listings' current price in case of any mistmatch
-    # for l in listings:
-    #     current_bid = l.current_bid.first()
-    #     if current_bid is not None:
-    #         l.current_price = current_bid.value
-    #         l.save()
-
     return render(request, "auctions/index.html", {
         "listings": listings,
         "categorys": categorys,
@@ -116,7 +109,6 @@ def listing(request, listing_id):
 
     # If the route was reached by POST
     if request.method == "POST":
-
         # If the user is not authenticated, can't do anything
         if request.user.is_anonymous:
             return render(request, "auctions/listing.html", {
@@ -140,7 +132,7 @@ def listing(request, listing_id):
                     "added": added
                 })
 
-            # If comment is valid, save it to model
+            # If comment is valid, save it and re-render page
             comment = Comment.objects.create(
                 content=content,
                 commenter=request.user,
@@ -169,7 +161,7 @@ def listing(request, listing_id):
                     "added": added
                 })
 
-            # Convert the new bid value to number
+            # Try converting the new bid value to number
             try:
                 bid_value = float(bid_value)
             # Render error if the new bid is not a number
@@ -182,13 +174,12 @@ def listing(request, listing_id):
                     "added": added
                 })
 
-            # Get the current bid info, if avail, for comparison
+            # Check if a current bid has already existed
             try:
                 current_bid = listing.current_bid.first()
             except:
                 current_bid = None
-            
-            # If a current bid exists, get the value and delete it
+            # If a current bid exists, check if bid value < current bid
             if current_bid is not None:
                 current_value = current_bid.value
                 # Error if bid value < current bid
@@ -203,7 +194,7 @@ def listing(request, listing_id):
                 # Else, delete the current bid if the new bid is qualified
                 current_bid.delete()
 
-            # Error if bid value < starting bid
+            # Check if bid value < starting bid
             elif bid_value < listing.starting_bid:
                 return render(request, "auctions/listing.html", {
                     "listing": listing,
@@ -235,7 +226,7 @@ def listing(request, listing_id):
                 "added": added
             })
     
-    # If the route was reached by GET, render the page
+    # If the route was reached by GET, render the listing page
     return render(request, "auctions/listing.html", {
         "listing": listing,
         "comments": comments,
@@ -257,15 +248,19 @@ def category_listings(request, category_id):
 
 
 def close_listing(request, listing_id):
-    # Get the listing requested with id
+    # Get the listing requested and mark it inactive
     listing = Listing.objects.get(pk=listing_id)
-
-    # Get the current highest bidder for this listing
-    bid = Bid.objects.get(listing=listing)
-
     listing.is_active = False
-    listing.winner = bid.bidder
-    listing.save()
+
+    # Get the current highest bid
+    bid = Bid.objects.filter(listing=listing).first()
+    
+    # If it exists, mark winner
+    if bid:
+        # Make the highest bidder the winner
+        listing.winner = bid.bidder
+
+    listing.save()   
 
     return HttpResponseRedirect(reverse("listing", args=(listing.id,)))
 
@@ -285,9 +280,11 @@ def past_listings(request):
 def watchlist(request, listing_id="None"):
     # If this route was reached by POST
     if request.method == "POST":
+        # Get the requested listing
         listing = Listing.objects.get(pk=listing_id)
-        
+        # Find out if it's already in the user's watchlist
         added = Watchlist.objects.filter(listing=listing_id, watcher=request.user)
+        
         if added:
             watchlist = Watchlist.objects.get(listing=listing, watcher=request.user)
             watchlist.delete()
@@ -301,7 +298,7 @@ def watchlist(request, listing_id="None"):
         return HttpResponseRedirect(reverse("listing", args=(listing.id,)))
 
 
-    # If this route was reached by GET
+    # If this route was reached by GET, return the user's watchlist
     watchlists = Watchlist.objects.filter(watcher=request.user).order_by('-id')
     if watchlists:
         listings = map(lambda x: x.listing, watchlists)

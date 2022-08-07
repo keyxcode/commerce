@@ -52,4 +52,4 @@ class Watchlist(models.Model):
     watcher = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.watcher} is watching: {self.listing}"
+        return f"{self.watcher}: {self.listing}"
