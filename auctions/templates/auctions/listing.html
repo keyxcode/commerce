@@ -1,58 +1,119 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
+    <!-- Heading -->
     <h2 class="my-3">{{ listing.title }}</h2>
     <hr>
+    <!-- Popup alert if avail -->
+    {% if message %}
+        <div class="alert alert-{{ type }}" role="alert">
+            {{ message }}
+        </div>
+    {% endif %}
+    <!-- Product img if avail -->
     <div class="container">
         <div class="row gx-5">
-            <div class="col-md-5 border">
+            <div class="col-md-5 border d-flex align-items-center justify-content-center">
                 {% if listing.image_url %}
-                    <img src="{{ listing.image_url }}" class="h-100 w-100" alt="product-image">
+                    <img src="{{ listing.image_url }}" class="mw-100 mh-100" alt="product-image">
                 {% else %}
                     <img src="https://st2.depositphotos.com/2586633/46477/v/380/depositphotos_464771766-stock-illustration-no-photo-or-blank-image.jpg" class="h-100 w-100" alt="product-image">
                 {% endif %}
             </div>
             <div class="col-md-7">
                 <div class="row mb-3">
+                    <!-- Current price -->
                     <div class="col-md-7">
-                        <span>Current bid: </span>
-                        <span class="h3">
-                            US
-                            {% if listing.current_bid %}
-                                ${{ listing.current_bid }}
+                        {% if listing.current_price %}
+                            <span>Current bid: </span>
+                            <span class="h3">
+                                US ${{ listing.current_price|floatformat:2 }}  
+                            </span>
+                        {% else %}
+                            <span>Starting bid: </span>
+                            <span class="h3">
+                                US ${{ listing.starting_bid|floatformat:2 }}   
+                            </span>
+                        {% endif %}
+                    </div>
+                    <!-- Current number of bids -->
+                    <div class="col-md-5">
+                        {% if listing.num_bids == 1%}
+                            [{{listing.num_bids}} bid]
+                        {% else %}
+                            [{{listing.num_bids}} bids]
+                        {% endif %}
+                    </div>
+                </div>
+                <hr>
+                {% if listing.is_active == True %}
+                    <!-- Bidding form -->
+                    <form action="{% url 'listing' listing.id %}" method="post" class="row mb-3">
+                        {% csrf_token %}
+                        <div class="col-md-7 form-group">
+                            <input class="form-control" name="bid_value" placeholder="Bid Amount" step="0.01" type="number">
+                        </div>
+                        <div class="col-md-5 form-group">
+                            <input class="btn btn-primary form-control" type="submit" value="Place Bid">
+                        </div>
+                    </form>
+                    <!-- Bidding hint -->
+                    <div class="row mb-3">
+                        <div class="col-md-7 font-italic text-muted">
+                            Enter US
+                            {% if listing.current_price %}
+                                ${{ listing.current_price|floatformat:2 }} 
                             {% else %}
-                                ${{ listing.starting_bid }}
+                                ${{ listing.starting_bid }} 
+                            {% endif %}
+                            or more
+                        </div>
+                        <!-- Watchlist toggle -->
+                        <form action="{% url 'watchlist' listing.id %}" method="post" class="col-md-5">
+                            {% csrf_token %}
+                            {% if added %}
+                                <input class="btn btn-outline-warning form-control" type="submit" value="Unwatch">
+                            {% else %}
+                                <input class="btn btn-outline-primary form-control" type="submit" value="Add to Watchlist">
+                            {% endif %}
+                        </form>
+                    </div>
+                {% else %}
+                    <!-- Bid over status -->
+                    <div class="row mb-3">
+                        <div class="col">This bid is over!</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <span>The winner is </span>
+                            <span class="fw-bold">{{ listing.winner.username }}</span>
+                        </div>    
+                    </div>
+                {% endif %}
+                <hr>
+                <!-- Close listing -->
+                <div class="row mb-3">
+                    <div class="col-md-7">
+                        <span class="h6">
+                            Sold by: 
+                        </span>
+                        <span>
+                            {% if user == listing.creator %}
+                                Yourself
+                            {% else %}                               
+                                {{ listing.creator.username }}
                             {% endif %}
                         </span>
                     </div>
-                    <div class="col-md-5">
-                        [{{listing.num_bids}} bids]
-                    </div>
+                    {% if user == listing.creator and listing.is_active %}
+                        <form action="{% url 'close_listing' listing.id %}" method="post" class="col-md-5">
+                            {% csrf_token %}
+                            <input class="btn btn-danger form-control" type="submit" value="Close Listing">
+                        </form>
+                    {% endif %}
                 </div>
                 <hr>
-                <form action="#" class="row mb-3">
-                    <div class="col-md-7 form-group">
-                        <input class="form-control" placeholder="Bid Amount" type="number">
-                    </div>
-                    <div class="col-md-5 form-group">
-                        <input class="btn btn-primary form-control" type="button" value="Place Bid">
-                    </div>
-                </form>
-                <div class="row mb-3">
-                    <div class="col-md-7 font-italic text-muted">
-                        Enter US
-                        {% if listing.current_bid %}
-                            ${{ listing.current_bid }} 
-                        {% else %}
-                            ${{ listing.starting_bid }} 
-                        {% endif %}
-                        or more
-                    </div>
-                    <form action="#" class="col-md-5">
-                        <input class="btn btn-outline-primary form-control" type="button" value="Add to Watchlist">
-                    </form>
-                </div>
-                <hr>
+                <!-- Product description -->
                 <div class="row mb-3">
                     <div class="col">
                         <span class="h6">
@@ -63,10 +124,36 @@
                         </span>
                     </div>
                 </div>
-                </div>
+                <hr>
             </div>
         </div>
-        <hr>
+    </div>
+    <hr>
+    <!-- Comments -->
+    <div class="container">
+        <div class="row md-3 gx-5">
+            <h3>Comments</h3>
+            <div class="col-md-5">
+                <form action="{% url 'listing' listing.id %}" method="post">
+                    {% csrf_token %}
+                    <textarea class="form-control mb-3" name="content" required rows="3"></textarea>
+                    <input class="btn btn-outline-primary form-control mb-3" type="submit">
+                </form>
+            </div>
+            <div class="col-md-7 mb-3">
+                {% if comments %}
+                    {% for comment in comments %}
+                        <div>
+                            <div class="fw-bold"> {{ comment.commenter.username }} </div>
+                            <span class="font-italic">{{ comment.content }}</span> 
+                        </div>
+                        <hr>
+                    {% endfor %}
+                {% else %}
+                    <span class="font-italic">No one has commented on this listing.</span>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
 

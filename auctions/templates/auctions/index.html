@@ -1,5 +1,6 @@
 {% extends "auctions/layout.html" %}
 
+<!-- Left list of categories -->
 {% block left-body %}
     <h5>Categories</h5>
     <div class="list-group">
@@ -11,47 +12,76 @@
     </div>
 {% endblock %}
 
+<!-- Main listings -->
 {% block body %}
-    <h2 class="my-3">Active Listings</h2>
+    <!-- Dynamic heading -->
+    <h2 class="my-3">
+        {% if category %}
+            Category: {{ category }}
+        {% else %}
+            {{ status }} Listings
+        {% endif %}
+    </h2>
     <hr>
-    {% for listing in listings %}
-    <div class="row gx-5">
-        <div class="col-md-3 border">
-            <a href="{% url 'listing' listing.id %}">
-            {% if listing.image_url %}
-                <img src="{{ listing.image_url }}" class="h-100 w-100" alt="product-image">
-            {% else %}
-                <img src="https://st2.depositphotos.com/2586633/46477/v/380/depositphotos_464771766-stock-illustration-no-photo-or-blank-image.jpg" class="h-100 w-100" alt="product-image">
-            {% endif %}
-            </a>
-        </div>
-        <div class="col-md-9">
-            <a href="{% url 'listing' listing.id %}">
-                <div class="row h5">
-                    {{ listing.title }}
-                </div>
-            </a>
-            <div class="row font-italic h3">
-                {% if listing.current_bid %}
-                    ${{ listing.current_bid }}
+    {% if listings %}
+        {% for listing in listings %}
+        <div class="row gx-5">
+            <!-- Product image -->
+            <div class="col-md-3 border d-flex align-items-center justify-content-center">
+                <a href="{% url 'listing' listing.id %}">
+                {% if listing.image_url %}
+                    <img src="{{ listing.image_url }}" class="mh-100 mw-100" alt="product-image">
                 {% else %}
-                    ${{ listing.starting_bid }}
+                    <img src="https://st2.depositphotos.com/2586633/46477/v/380/depositphotos_464771766-stock-illustration-no-photo-or-blank-image.jpg" class="h-100 w-100" alt="product-image">
                 {% endif %}
+                </a>
             </div>
-            <div class="row font-italic text-muted">
-                "{{ listing.description }}"
-            </div>
-            <div class="row">
-                <span class="ps-0">
-                    Category:
-                    <a class="style-a" href="{% url 'category_listings' listing.category.id %}">
-                        {{ listing.category }} 
-                    </a>
-                </span>
+            <!-- Product info -->
+            <div class="col-md-9">
+                <!-- Clickable title -->
+                <a href="{% url 'listing' listing.id %}">
+                    <div class="row lead">
+                        {{ listing.title }}
+                    </div>
+                </a>
+                <!-- Current price -->
+                <div class="row h3">
+                    {% if listing.current_price %}
+                        ${{ listing.current_price }}
+                    {% else %}
+                        ${{ listing.starting_bid }}
+                    {% endif %}
+                </div>
+                <!-- Current number of bids -->
+                <div class="row text-muted">
+                    {% if listing.num_bids == 1 %}
+                        {{ listing.num_bids }} bid
+                    {% else %}
+                        {{ listing.num_bids }} bids
+                    {% endif %}
+                </div>
+                <!-- Product description if avail -->
+                {% if listing.description %}
+                    <div class="row font-italic text-muted">
+                        "{{ listing.description }}"   
+                    </div>
+                {% endif %}
+                <!-- Product category -->
+                <div class="row">
+                    <span class="ps-0">
+                        Category:
+                        <a class="style-a" href="{% url 'category_listings' listing.category.id %}">
+                            {{ listing.category }} 
+                        </a>
+                    </span>
+                </div>
             </div>
         </div>
-    </div>
-    <hr>
-    {% endfor %}
-
+        <hr>
+        {% endfor %}
+    {% else %}
+        <div class="row lead">
+            <span>It's empty here!</span>
+        </div>
+    {% endif %}
 {% endblock %}

@@ -24,3 +24,12 @@ a:hover {
 .font-italic {
     font-style: italic !important;
 }
+
+.plain-text {
+    text-decoration: none;
+    color: black;
+}
+
+.plain-text:hover {
+    color: black;   
+}
