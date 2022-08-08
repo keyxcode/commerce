@@ -38,6 +38,7 @@ class Bid(models.Model):
     def __str__(self):
         return f"Bid: {self.value} for {self.listing} by {self.bidder}"
 
+
 class Comment(models.Model):
     content = models.CharField(max_length=256)
     commenter = models.ForeignKey(User, on_delete=models.CASCADE)
