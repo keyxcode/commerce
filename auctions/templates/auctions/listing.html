@@ -81,16 +81,29 @@
                 {% else %}
                     <!-- Bid over status -->
                     <div class="row mb-3">
-                        <div class="col text-danger">This bid is over!</div>
+                        <div class="col-md-7 text-danger">This bid is over!</div>
+                        <!-- Watchlist toggle -->
+                        <form action="{% url 'watchlist' listing.id %}" method="post" class="col-md-5">
+                            {% csrf_token %}
+                            {% if added %}
+                                <input class="btn btn-outline-warning form-control" type="submit" value="Unwatch">
+                            {% else %}
+                                <input class="btn btn-outline-primary form-control" type="submit" value="Add to Watchlist">
+                            {% endif %}
+                        </form>
                     </div>
                     <div class="row mb-3">
                         <div class="col">
                             {% if listing.winner %}
-                            <span class="text-success">Winner: </span>
-                            <span class="fw-bold">{{ listing.winner.username }}</span>
-                            <span>({{ listing.winner.email }})</span>
+                                {% if user == listing.winner %}
+                                    <span class="text-success fw-bold">You won this bid!</span>
+                                {% else %}
+                                    <span class="text-success fw-bold">Winner: </span>
+                                    <span class="fw-bold">{{ listing.winner.username }}</span>
+                                    <span>({{ listing.winner.email }})</span>
+                                {% endif %}
                             {% else %}
-                            <span> There are no winners for this listing.</span>
+                                <span> No one won this bid.</span>
                             {% endif %}
                         </div>    
                     </div>
@@ -102,13 +115,9 @@
                         <span class="h6">
                             Seller: 
                         </span>
-                        <span>
-                            {% if user == listing.creator %}
-                                Yourself
-                            {% else %}                               
-                                {{ listing.creator.username }}
-                                ({{ listing.creator.email }})
-                            {% endif %}
+                        <span>                            
+                            {{ listing.creator.username }}
+                            ({{ listing.creator.email }})
                         </span>
                     </div>
                     {% if user == listing.creator and listing.is_active %}

@@ -22,8 +22,8 @@ class Listing(models.Model):
     current_price = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
     num_bids = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, related_name="similar_listings")
-    creator = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="all_listings")
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="creator_listings")
     winner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
@@ -36,7 +36,7 @@ class Bid(models.Model):
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="current_bid")
 
     def __str__(self):
-        return f"Bid: {self.value} for {self.listing} made by {self.bidder}"
+        return f"Bid: {self.value} for {self.listing} by {self.bidder}"
 
 class Comment(models.Model):
     content = models.CharField(max_length=256)

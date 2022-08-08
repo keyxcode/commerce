@@ -105,20 +105,21 @@ def listing(request, listing_id):
     # Get the listing & comments with the provided id
     listing = Listing.objects.get(pk=listing_id)
     comments = Comment.objects.filter(listing=listing).order_by('-id')
+
+    # If the user is not authenticated, can't do anything
+    if request.user.is_anonymous:
+        return render(request, "auctions/listing.html", {
+            "listing": listing,
+            "comments": comments,
+            "message": "Please log in to continue.",
+            "type"  : "warning",
+        })
+
+    # If the user is logged in, get their watchlist
     added = Watchlist.objects.filter(listing=listing_id, watcher=request.user)
 
     # If the route was reached by POST
     if request.method == "POST":
-        # If the user is not authenticated, can't do anything
-        if request.user.is_anonymous:
-            return render(request, "auctions/listing.html", {
-                "listing": listing,
-                "comments": comments,
-                "message": "Please log in to continue.",
-                "type"  : "warning",
-                "added": added
-            })
-
         # If this is a comment submission request
         content = request.POST.get("content", None)
         if content is not None:
@@ -280,6 +281,10 @@ def past_listings(request):
 def watchlist(request, listing_id="None"):
     # If this route was reached by POST
     if request.method == "POST":
+        # If the user is not authenticated, can't do anything
+        if request.user.is_anonymous:
+            return HttpResponseRedirect(reverse("listing", args=(listing_id,)))
+            
         # Get the requested listing
         listing = Listing.objects.get(pk=listing_id)
         # Find out if it's already in the user's watchlist
